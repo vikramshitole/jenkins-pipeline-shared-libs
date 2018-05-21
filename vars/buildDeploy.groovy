@@ -9,7 +9,7 @@ def call(Map config) {
     def gitVersion = sh(returnStdout: true, script: 'git describe --tags --dirty=.dirty').trim()
 
     stage('Checkout repo') {
-      git url: "git@${gitProvider}:${appRepo}/${appName}.git"
+      git url: "git@${gitProvider}:${appRepo}/${appName}.git", branch: env.BRANCH_NAME
     }
 
     stage('Build') {
