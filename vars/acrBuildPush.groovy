@@ -11,11 +11,13 @@ def call(Map config) {
       def spTenantId = config.spTenantId
       def acrContainerRegistryName = config.acrRepo.tokenize('.')[0]
       def isDependencies = config.isDependencies ?: false
-      def gitVersion = sh(returnStdout: true, script: 'git describe --tags --dirty=.dirty').trim()
+      def branchName = env.BRANCH_NAME ?: 'master'  // env.BRANCH_NAME is not set for non-multipipeline jobs
 
       stage('Checkout repo') {
         git url: "git@${gitProvider}:${appRepo}/${appName}.git", branch: env.BRANCH_NAME
       }
+
+      def gitVersion = sh(returnStdout: true, script: 'git describe --tags --dirty=.dirty').trim()
 
       stage('ACR login') {
         sh  """#!/usr/bin/env bash
