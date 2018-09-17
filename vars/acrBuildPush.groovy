@@ -10,6 +10,7 @@ def call(Map config) {
       def spClientSecret = config.spClientSecret
       def spTenantId = config.spTenantId
       def acrContainerRegistryName = config.acrRepo.tokenize('.')[0]
+      def isDependencies = config.isDependencies ?: false
       def gitVersion = sh(returnStdout: true, script: 'git describe --tags --dirty=.dirty').trim()
 
       stage('Checkout repo') {
@@ -25,13 +26,21 @@ def call(Map config) {
       }
 
       stage('Build image') {
-        sh "./build.sh ${acrRepo}/${appName} ${gitVersion}"
+        if (isDependencies) {
+          sh "./build-deps.sh ${acrRepo}/${appName} dependencies"
+        } else {
+          sh "./build.sh ${acrRepo}/${appName} ${gitVersion}"
+        }
       }
 
       stage('Push image') {
         if (env.BRANCH_NAME == 'master') {
-          sh "docker push ${acrRepo}/${appName}:${gitVersion}"
-          sh "docker push ${acrRepo}/${appName}:latest"
+          if (isDependencies) {
+            sh "docker push ${acrRepo}/${appName}:dependencies"
+          } else {
+            sh "docker push ${acrRepo}/${appName}:${gitVersion}"
+            sh "docker push ${acrRepo}/${appName}:latest"
+          }
         }
       }
     }
