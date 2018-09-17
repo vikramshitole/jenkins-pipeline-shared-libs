@@ -29,7 +29,7 @@ def call(Map config) {
 
       stage('Build image') {
         if (isDependencies) {
-          sh "./build-deps.sh ${acrRepo}/${appName} dependencies"
+          sh "./build-deps.sh ${acrRepo}/${appName}"
         } else {
           sh "./build.sh ${acrRepo}/${appName} ${gitVersion}"
         }
