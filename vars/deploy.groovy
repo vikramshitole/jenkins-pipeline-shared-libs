@@ -6,9 +6,10 @@ def call(Map config) {
       def environment = config.environment
       def gitVersion = config.gitVersion
       def registryAddress = config.registryAddress
+      def isDependencies = config.isDependencies ?: false
 
       stage('Deploy microservice') {
-        if (env.BRANCH_NAME == 'master') {
+        if (env.BRANCH_NAME == 'master' && ! config.isDependencies) {
           echo "Deploying ${appName} version ${gitVersion}"
           build(
               job: 'deploy-microservice',

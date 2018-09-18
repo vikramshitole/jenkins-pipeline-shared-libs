@@ -11,10 +11,12 @@ def call(Map config) {
   }
 
   if (isOnAzure()) {
+    config.registryAddress = config.registryAddresses['acr']
     acrBuildPush(config)
     config.gitVersion = env.GIT_VERSION
     deploy(config)
   } else {
+    config.registryAddress = config.registryAddresses['ecr']
     ecrBuildPushDeploy(config)
   }
 }
