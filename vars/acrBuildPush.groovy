@@ -45,6 +45,7 @@ def call(Map config) {
           }
         }
       }
+      env.GIT_VERSION = gitVersion
     }
   }
 }
