@@ -6,7 +6,7 @@ def call(Map config) {
       def gitProvider = config.gitProvider
       def appRepo = config.appRepo
       def deployNameSpace = config.deployNameSpace
-      def ecrRepo = config.ecrRepo
+      def registryAddress = config.registryAddress
       def repo = checkout scm
       def gitVersion = sh(returnStdout: true, script: 'git describe --tags --dirty=.dirty').trim()
 
@@ -19,20 +19,20 @@ def call(Map config) {
       }
 
       stage('Build image') {
-        sh "./build.sh ${ecrRepo}/${appName} ${gitVersion}"
+        sh "./build.sh ${registryAddress}/${appName} ${gitVersion}"
       }
 
       stage('Push image') {
         if (env.BRANCH_NAME == 'master') {
-          sh "docker push ${ecrRepo}/${appName}:${gitVersion}"
-          sh "docker push ${ecrRepo}/${appName}:latest"
+          sh "docker push ${registryAddress}/${appName}:${gitVersion}"
+          sh "docker push ${registryAddress}/${appName}:latest"
         }
       }
 
       stage('Update kubernetes') {
         if (env.BRANCH_NAME == 'master') {
           sh "kubectl apply -f k8s.yaml"
-          sh "kubectl set image deployment/${appName} ${appName}=${ecrRepo}/${appName}:${gitVersion} -n ${deployNameSpace}"
+          sh "kubectl set image deployment/${appName} ${appName}=${registryAddress}/${appName}:${gitVersion} -n ${deployNameSpace}"
         }
       }
     }
