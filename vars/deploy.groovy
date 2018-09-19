@@ -17,7 +17,7 @@ def call(Map config) {
                   string(name: 'MICROSERVICE', value: appName),
                   string(name: 'VERSION', value: gitVersion),
                   string(name: 'ENV', value: environment),
-                  string(name: 'DOCKER_REPO', value: registry),
+                  string(name: 'DOCKER_REPO', value: registryAddress),
                   string(name: 'CONFIG_BRANCH', value: env.BRANCH_NAME)
               ]
           )
