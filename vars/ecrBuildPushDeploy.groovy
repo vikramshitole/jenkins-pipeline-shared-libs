@@ -35,6 +35,12 @@ def call(Map config) {
           sh "kubectl set image deployment/${appName} ${appName}=${registryAddress}/${appName}:${gitVersion} -n ${deployNameSpace}"
         }
       }
+      stage('Wait for deployment to complete') {
+        if (env.BRANCH_NAME == 'master') {
+          sh "timeout -t 500 kubectl -n ${deployNameSpace} rollout status deployments/${appName}"
+        }
+      }
+      
     }
   }
 }
