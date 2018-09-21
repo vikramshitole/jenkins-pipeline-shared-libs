@@ -36,7 +36,7 @@ def call(Map config) {
       }
 
       stage('Push image') {
-        if (env.BRANCH_NAME == 'master') {
+        if (branchName == 'master') {
           if (isDependencies) {
             sh "docker push ${registryAddress}/${appName}:dependencies"
           } else {
