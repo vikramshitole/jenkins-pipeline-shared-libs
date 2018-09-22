@@ -44,7 +44,7 @@ def call(Map config) {
                build job: '/integration-test-build', propagate: true
             } catch (error) {
                sh "kubectl set image deployment/${appName} ${appName}=${currentImage} -n ${deployNameSpace}"
-               sh "timeout -t 500 kubectl -n ${deployNameSpace} rollout status deployments/${appName}"
+               sh "timeout -t 800 kubectl -n ${deployNameSpace} rollout status deployments/${appName}"
                throw error
             }
         }
