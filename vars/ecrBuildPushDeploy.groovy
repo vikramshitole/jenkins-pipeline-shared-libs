@@ -29,10 +29,24 @@ def call(Map config) {
         }
       }
 
-      stage('Update kubernetes') {
+     stage('Update kubernetes') {
         if (env.BRANCH_NAME == 'master') {
+          currentImage = sh "kubectl get deployment/${appName} -o wide -n apps | grep -v IMAGE | awk '{print \$8}'"
           sh "kubectl apply -f k8s.yaml"
           sh "kubectl set image deployment/${appName} ${appName}=${registryAddress}/${appName}:${gitVersion} -n ${deployNameSpace}"
+          sh "timeout -t 500 kubectl -n ${deployNameSpace} rollout status deployments/${appName}"
+        }
+      }
+
+      stage('Run integration Tests') {
+        if (env.BRANCH_NAME == 'master') {
+            try {
+               build job: '/integration-test', propagate: true
+            } catch (error) {
+               sh "kubectl set image deployment/${appName} ${appName}=${currentImage} -n ${deployNameSpace}"
+               sh "timeout -t 500 kubectl -n ${deployNameSpace} rollout status deployments/${appName}"
+               throw error
+            }
         }
       }
     }
