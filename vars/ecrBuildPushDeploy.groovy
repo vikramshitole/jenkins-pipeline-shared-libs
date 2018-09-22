@@ -41,7 +41,7 @@ def call(Map config) {
       stage('Run integration Tests') {
         if (env.BRANCH_NAME == 'master') {
             try {
-               build job: '/integration-test', propagate: true
+               build job: '/integration-test-build', propagate: true
             } catch (error) {
                sh "kubectl set image deployment/${appName} ${appName}=${currentImage} -n ${deployNameSpace}"
                sh "timeout -t 500 kubectl -n ${deployNameSpace} rollout status deployments/${appName}"
